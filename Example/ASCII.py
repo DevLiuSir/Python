@@ -1,3 +1,12 @@
+#!/usr/bin/env python
+#-*- coding:utf-8 -*-
+# Author: liuchuan
+# File: ASCII.py
+# Datetime: 2019-07-02 17:22
+# Software: PyCharm
+
+
+# Python 十进制转二进制、八进制、十六进制
 
 # ASCII 进制
 # 进制之间的转换
