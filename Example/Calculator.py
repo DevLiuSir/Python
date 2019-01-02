@@ -1,6 +1,15 @@
+#!/usr/bin/env python
+#-*- coding:utf-8 -*-
+# Author: liuchuan
+# File: Calculator.py
+# Datetime: 2019-07-01 17:22
+# Software: PyCharm
+
+
+# Python 简单计算器实现
 
 """
-简单的计算器
+简单的计算器: 包括两个数基本的加减乘除运输
 """
 
 # 定义函数
