@@ -1,3 +1,10 @@
+#!/usr/bin/env python
+#-*- coding:utf-8 -*-
+# Author: liuchuan
+# File: 01_String.py
+# Datetime: 2019-06-28 15:59
+# Software: Visual Studio Code
+
 
 #注释
 # Python中单行注释以 # 开头
