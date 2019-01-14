@@ -60,7 +60,7 @@ def get_url(url, headers):
 
 
 
-# 下载每张照片的
+# 下载每张照片
 def get_second_parse(list_url, headers):
         count = 1
         try:
