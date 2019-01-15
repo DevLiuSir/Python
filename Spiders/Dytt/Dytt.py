@@ -11,55 +11,47 @@ import requests     # 网络请求模块
 import re           # 提取数据
 import time         # time.sleep()
 
+
 # 电影天堂:     https://www.dytt8.net/
+
 
 # 定义一个Spider类，并且添加一个加载页面的成员方法
 class Spider(object):
 
 
-    # 加载网页数据
     def load_webpage_data(self, url):
         """
-        下载指定url页面的内容
+        加载指定url页面的内容
         :param url: 链接
         :return:
         """
-
-        header = {
+        Headers = {
             'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36'
         }
 
-        response = requests.get(url = url, headers = header)
-
-        # 编码
-        response.encoding = 'gb2312'
-
+        response = requests.get(url=url, headers=Headers)
+        response.encoding = 'gb2312'        # 编码
         print("状态码:", (response.status_code))
-
         html = response.text
 
-        # 打印页面内容
-        # print(html)
+        # r.raise_for_status()  #如果状态不是200，则引发异常
+        try:
+            if response.status_code == 200:  # 如果状态码为：200，访问成功，返回网页源码，否返回none
+                return html
+            return None
+        except requests.ConnectTimeout:
+            print('连接远程服务器超时异常！')
 
-        # 返回页面内容
-        return html
 
-
-
-    # 解析网页
     def parse_webpage(self, html):
-
         """
         筛选html内容,返回列表
         :param html:
         :return:
         """
 
-        # <div class="co_content8">.......</div>
-
-        # 定义图片正则表达式, re.compile: 编译表达式构造匹配模式
+        # re.compile: 编译表达式构造匹配模式
         # pattern: 正则中的模式字符串。
-        # pattern = re.compile(r'<div class="co_content8">(.*?)</div>', re.S)
 
         # <a href = "/html/gndy/dyzz/20190702/58786.html" class ="ulink" > 2019年剧情传记《最佳敌人》BD中英双字幕 </a >
 
@@ -75,18 +67,21 @@ class Spider(object):
         return item_list
 
 
-    # 拼接电影详情页码的url
+
     def join_movies_detail_url(self, item_list):
+        '''
+        拼接电影详情页码的url
+        :param item_list: 匹配的电影链接列表
+        :return:
+        '''
 
         for li in item_list:
 
             # 拼接电影详情页码的url
             base_url = 'https://www.dytt8.net'+li[0]
-            # print(base_url)
 
             # 电影详情页面
-            movie_details_url = self.loadPage(base_url)
-            # print(movie_details_url)
+            movie_details_url = self.load_webpage_data(base_url)
 
             regx2 = r'<td style="WORD-WRAP: break-word" bgcolor="#fdfddf"><a href="(.*?)">.*?</a></td>'
 
@@ -100,7 +95,6 @@ class Spider(object):
 
     # 写入文本
     def write_text(self, list):
-
         """
         已追加的形式,存储筛选后的内容
         :param list: 筛选后的数据, 列表形式
@@ -129,7 +123,6 @@ class Spider(object):
 
 
 
-
 if __name__ == '__main__':
 
     # 实例化类对象
@@ -147,6 +140,4 @@ if __name__ == '__main__':
         item_list = my_spider.parse_webpage(html)
 
         # 4.拼接url
-        join_url = my_spider.join_movies_detail_url(item_list)
-
-        # print(join_url)
+        my_spider.join_movies_detail_url(item_list)
