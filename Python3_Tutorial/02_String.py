@@ -117,6 +117,21 @@ print("转换字符串中所有大写字符为小写: ", str2.lower())
 print(str3.isalnum())
 
 
+# ------------------------ 给定一个字符串，然后移除制定位置的字符 ----------
+def remove(str, num):
+    '''
+    给定一个字符串，然后移除制定位置的字符
+    :param str: 原字符串
+    :param num: 要移除的位置
+    :return: 移除后的字符串
+    '''
+    return str[:num] + str[num + 1:]
+
+
+print(remove(str, 4))
+
+
+
 
 # ------------------------ 字符串翻转 ------------------------
 # 给定一个字符串，然后将其翻转，逆序输出。
@@ -149,3 +164,22 @@ print('常量 PI 的值近似为: {}。'.format(math.pi))
 # 可选项 ':' 和格式标识符可以跟着字段名。 这就允许对值进行更好的格式化。 下面的例子将 Pi 保留到小数点后三位：
 print('常量 PI 的值近似为: {0:.3f}。'.format(math.pi))
 # 常量 PI 的值近似为 3.142。
+
+
+# f-String格式化
+'''
+相比较占位符的方式，python3.6版本新增了 f-String 格式化的方式，
+比较简单易懂，这是目前我用的最多的方式，推荐使用这种方式。
+'''
+
+name = 'jack'
+age = 20
+print(f'Hello, {name}. You are {age}.')
+
+# 大写的F也适用
+girls = 'rose'
+print(F'Hello, {girls}.')
+
+
+salary = 6.6666
+print(f'{salary:.2f}')
