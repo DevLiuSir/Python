@@ -2,7 +2,7 @@
 #-*- coding:utf-8 -*-
 # Author: liuchuan
 # Contact: liuchuan910927@gmail.com
-# File: doubanTop.py
+# File: douban_movies_top_250.py
 # Datetime: 2019/11/23 15:13
 # Software: PyCharm
 
@@ -119,7 +119,7 @@ def run():
     print(df)
 
     # pandas 写入csv文件
-    # df.to_csv("豆瓣电影TOP250.csv", encoding='utf-8', index=False, header=True)
+    df.to_csv("豆瓣电影TOP250.csv", encoding='utf-8', index=False, header=True)
     print("写入完成!")
 
     # pandas读取csv文件
