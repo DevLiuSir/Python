@@ -10,12 +10,12 @@
 import requests     # 网络请求模块
 import re           # 提取数据
 import time         # time.sleep()
-
+from lxml import etree
 
 # 电影天堂:     https://www.dytt8.net/
 
 
-# 定义一个Spider类，并且添加一个加载页面的成员方法
+# 爬虫类
 class Spider(object):
 
 
@@ -67,7 +67,6 @@ class Spider(object):
         return item_list
 
 
-
     def join_movies_detail_url(self, item_list):
         '''
         拼接电影详情页码的url
@@ -93,10 +92,9 @@ class Spider(object):
             self.write_text(ftp)
 
 
-    # 写入文本
     def write_text(self, list):
         """
-        已追加的形式,存储筛选后的内容
+        写入文本. 已追加的形式,存储筛选后的内容
         :param list: 筛选后的数据, 列表形式
         :return:
         """
@@ -122,13 +120,42 @@ class Spider(object):
                 f.write(content+"\n")
 
 
+    def get_max_page_number(self):
+        '''
+        获取最大页码
+        :return: 最大页码
+        '''
+        baseURL = 'https://www.dytt8.net/html/gndy/dyzz/index.html'
+
+        content = self.load_webpage_data(baseURL)
+
+        # 抽取想要的数据: 图片标题 \ 图片链接等等
+        url = etree.HTML(content)
+
+        # 字符串列表
+        all = url.xpath("//div[@class='x']//option/text()")  # 所有的数据都在li标签下,我们一这个为总节点
+
+        # 数字列表
+        # 使用内置map返回一个map对象，再用list将其转换为列表
+        number = list(map(int , all))       # Python3 中 列表字符串 转 数字
+
+        # 获取列表最大值
+        max_list = max(number)
+
+        return max_list
+
 
 if __name__ == '__main__':
 
     # 实例化类对象
     my_spider = Spider()
 
-    for n in range(1,198):  # 总共有197页数据, 循环获取网址
+    # 最大页码
+    max_number = my_spider.get_max_page_number()
+
+    # print(max_number)
+
+    for n in range(1, max_number + 1):      # 循环获取所有网址
 
         # 1.获取所有的网址
         url = 'https://www.dytt8.net/html/gndy/dyzz/list_23_'+str(n)+'.html'
