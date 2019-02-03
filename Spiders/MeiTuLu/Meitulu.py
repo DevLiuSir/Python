@@ -3,7 +3,7 @@
 # Author: liuchuan
 # Contact: liuchuan910927@gmail.com
 # File: Meitulu.py
-# Datetime: 2019/07/13 01:23
+# Datetime: 2019/12/28 01:43
 # Software: PyCharm
 
 
@@ -16,6 +16,24 @@ from multiprocessing import Pool
 #  multiprocessing模块Pool类
 #  Pool类可以提供指定数量的进程供用户调用，当有新的请求提交到Pool中时，如果池还没有满，就会创建一个新的进程来执行请求。
 #  如果池满，请求就会告知先等待，直到池中有进程结束，才会创建新的进程来执行这些请求。
+
+'''
+ 
+# 'https://www.meitulu.com/t/youwuguan/'  尤物馆
+# 'https://www.meitulu.com/t/girlt/'  果团网 , 'https://www.meitulu.com/t/mistar/', 魅妍社
+# 'https://www.meitulu.com/t/1088/', 星颜社 'https://www.meitulu.com/t/ishow/', iSHOW爱秀
+# 'https://www.meitulu.com/t/huayan/',花の颜 'https://www.meitulu.com/t/xingleyuan/',星乐园
+# 'https://www.meitulu.com/t/tukmo/', 'https://www.meitulu.com/t/aiss/',
+# 'https://www.meitulu.com/t/miitao/', 'https://www.meitulu.com/t/uxing/',
+# 'https://www.meitulu.com/t/taste/',  'https://www.meitulu.com/t/micat/',
+# 'https://www.meitulu.com/t/candy/', 'https://www.meitulu.com/t/yunvlang/',
+# 'https://www.meitulu.com/t/youmihui/', 'https://www.meitulu.com/t/1113/',
+# 'https://www.meitulu.com/t/1209/', 'https://www.meitulu.com/t/imiss/',
+# 'https://www.meitulu.com/t/yingsihui-wings/', https://www.meitulu.com/t/dianannan/ 嗲囡囡
+# url可更改为上面随意一个
+# 美图录的随意一个目录url复制即可运行
+
+'''
 
 """
 1、https://www.meitulu.com/t/changtui/               ：获取主页美女套图链接，名称。
@@ -39,8 +57,8 @@ class MeiTuLuSpider:
         # 主要套图URL
         self.base_url = 'https://www.meitulu.com/t/changtui/'
 
-        # 套图详情URL
-        self.picture_details_url = 'https://www.meitulu.com'
+        # 网站主URL
+        self.main_url = 'https://www.meitulu.com'
 
 
     def load_webpage_data(self, url):
@@ -67,14 +85,12 @@ class MeiTuLuSpider:
             print('连接远程服务器超时异常！')
 
 
-
     def filter_data(self, html):
         '''
         筛选html内容
         :param html: 网页源码
         :return: 套图链接, 套图名称
         '''
-
         # re.compile: 编译表达式构造匹配模式
         # pattern: 正则中的模式字符串。
 
@@ -90,13 +106,41 @@ class MeiTuLuSpider:
         # 在页面中匹配图片链接
         picture_list = re.findall(pattern, html)  # findall:返回的是列表
 
+        all_names = []  # 分类名称列表
+        all_links = []  # 分类链接列表
+
         # 遍历匹配成功的链接
         for n in picture_list:
-            link = n[0]     # 取第0个元素: 套图的链接
-            # Cover = n[1]    # 去第1个元素: 套图封面
-            name = n[2]     # 取第2个元素：套图名称
+            # Cover = n[1]          # 去第1个元素: 套图封面
+            all_links.append(n[0])  # 取第0个元素: 套图的链接
+            all_names.append(n[2])  # 取第2个元素：套图名称
+        return all_names, all_links
 
-            return link, name
+
+    def get_url_of_all_pages_in_gallery(self, max_pages_number, need_spliced_url):
+        '''
+        根据网页里下一页的规律, 利用拼接，获取图集里所有页面URL
+        :param max_pages_number:  网页中最大页码
+        :param need_spliced_url:  需要拼接的主要URL
+        :return: 拼接后的所有URL列表
+        '''
+        # 定义一个列表，用来存储拼接后的所有URL
+        all_urls = []
+
+        # 定义一个变量，用来存储拼接后的URL
+        splice_after_url = ""
+
+        # 获取所有页面URL
+        count = 1
+        while count <= int(max_pages_number):
+            if count <= 1:
+                splice_after_url = need_spliced_url
+            else:   # 替换字符串
+                splice_after_url = str(need_spliced_url).replace('.html', f'_{count}.html')
+            count += 1
+            all_urls.append(splice_after_url)
+
+        return all_urls
 
 
     def get_details_set(self, photoSetLink, picture_name):
@@ -115,32 +159,26 @@ class MeiTuLuSpider:
 
         # 2.1.页码数
         next_list = html.xpath('//div[@id="pages"]/a/text()')
+
         # 2.2.下一页URL
-        next_url = html.xpath('//div[@id="pages"]/a/@href')
+        next_url_list = html.xpath('//div[@id="pages"]/a/@href')
+        next_url_list.pop()             # 移除最后一个重复的元素: 下一页
 
-        next_url.pop()  # 移除最后一个重复的元素
+        # 2.3.最大页码
+        max_page = next_list[-2]
 
-        base_url = next_url[0]      # 基础的URL地址
-        max_page = next_list[-2]    # 最大页码
-        splice_after_url = ""       # 拼接后的URL
-
-        # 获取所有页面URL
-        count = 1
-        while count <= int(max_page):
-            if count <= 1:
-                splice_after_url = photoSetLink
-            else:  # 替换字符串
-                splice_after_url = str(photoSetLink).replace('.html', f'_{count}.html')
-            count += 1
+        # 3.拼接后的所有URL
+        splice_after_url_list = self.get_url_of_all_pages_in_gallery(max_page, photoSetLink)
+        # 3.1。遍历所有URL
+        for splice_after_url in splice_after_url_list:
 
             big_images = self.load_webpage_data(splice_after_url)
-
             html = etree.HTML(big_images)
 
-            # 大图名称
+            # 4获取最终想要的数据
+            # 4.1.大图名称
             alt_list = html.xpath('//div/center/img/@alt')
-
-            # 大图链接
+            # 4.2.大图链接
             src_list = html.xpath('//div/center/img/@src')
 
             '''
@@ -187,8 +225,8 @@ class MeiTuLuSpider:
         # 根据文件名，检查路径是否存在？
         # 如果目录已经存在，就不用再次爬取，避免重复，提高效率。存在返回 Flase，否则反之
         if not os.path.exists(folder_name):
-            os.makedirs(folder_name)  # 如果不存在路径，根据 folder_name 创建文件夹
-            # os.chdir(folder_name)       # 改变当前工作目录
+            os.makedirs(folder_name)      # 如果不存在路径，根据 folder_name 创建文件夹
+            os.chdir(folder_name)         # 改变当前工作目录
             return True
 
         # print("文件夹已经存在！")
@@ -225,27 +263,37 @@ class MeiTuLuSpider:
         return urls
 
 
-
     def run(self):
         """
         主运行函数
         """
+        pool = Pool(30)     # 开启30个进程
 
         # 1.获取所有URL
         all_urls = self.get_all_url()
+
         # 1.1.遍历网址
         for url in all_urls:
+
             # 2.根据所有网址，加载页面内容
             html = self.load_webpage_data(url)
+
             # 3.筛选数据(获取美女套图封面、链接、名称)
             link_and_name = self.filter_data(html)
-            # 4.根据套图链接\名称
-            self.get_details_set(link_and_name[0], link_and_name[1])
 
+            for atlas_main_name, atlas_main_link in zip(link_and_name[0], link_and_name[1]):
+                # link_and_name[0]: 套图名称
+                # link_and_name[1]: 套图链接
+                # atlas_main_name: 图集主要名称
+                # atlas_main_link: 图集主要链接
 
+                # 4.获取套图, 并下载
+                pool.apply_async(self.get_details_set, args=(atlas_main_link, atlas_main_name))
+            pool.close()
+            pool.join()
+            print('当前图集所有图片已下载完成......')
 
 
 if __name__ == '__main__':
-
     mei_tu_lu = MeiTuLuSpider()
     mei_tu_lu.run()
