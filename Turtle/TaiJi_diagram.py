@@ -63,7 +63,7 @@ def draw_text(r):
     t.penup()
     t.goto(0, -r - 50)                      # 移动到该半边的鱼眼的圆上 -r - 50 表示移动到哪边
     t.pendown()
-    t.write("太极图 made by ChinaHackers", font=('Arial', 12, 'normal'))
+    t.write("太极图 made by DevLiuSir", font=('Arial', 12, 'normal'))
 
 
 
