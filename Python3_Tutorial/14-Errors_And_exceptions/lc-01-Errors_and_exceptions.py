@@ -43,3 +43,26 @@ except ZeroDivisionError as error:  # 不能被0整除(输入0时,打印的错�
     print(error)
 except ValueError as error:         # 类型错误(输入非数字时,打印的错误信息)
     print(error)
+
+
+'''
+try/except...else
+try/except 语句还有一个可选的 else 子句，如果使用这个子句，那么必须放在所有的 except 子句之后。
+
+else 子句将在 try 子句没有发生任何异常的时候执行。
+
+'''
+
+
+# 以下实例在 try 语句中判断文件是否可以打开，如果打开文件时正常的没有发生异常则执行 else 部分的语句，读取文件内容：
+
+for arg in sys.argv[1:]:
+    try:
+        f = open(arg, 'r')
+    except IOError:
+        print('cannot open', arg)
+    else:
+        print(arg, 'has', len(f.readlines()), 'lines')
+        f.close()
+
+# 使用 else 子句比把所有的语句都放在 try 子句里面要好，这样可以避免一些意想不到，而 except 又无法捕获的异常。
